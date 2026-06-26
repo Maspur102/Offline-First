@@ -15,9 +15,9 @@ class HomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.rocket_launch, size: 100, color: Colors.blueAccent),
+            const Icon(Icons.article, size: 100, color: Colors.blueAccent),
             const SizedBox(height: 20),
-            const Text('Skeleton Project Siap!', style: TextStyle(fontSize: 24)),
+            const Text('Tugas Individu: Skeleton Siap!', style: TextStyle(fontSize: 24)),
             const SizedBox(height: 10),
             Text('Base URL: ${EnvConfig.baseUrl}', style: const TextStyle(color: Colors.grey)),
           ],
