@@ -14,14 +14,13 @@ class ApiClient {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          // Satpam otomatis menyelipkan API Key ke dalam query (misal: ?apiKey=xxxx)
           options.queryParameters['apiKey'] = EnvConfig.apiKey;
-          
           logger.i('MENGIRIM REQUEST: [${options.method}] ${options.uri}');
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          logger.s('BERHASIL [${response.statusCode}]: ${response.requestOptions.uri}');
+          // PERBAIKAN: Mengganti logger.s menjadi logger.i
+          logger.i('BERHASIL [${response.statusCode}]: ${response.requestOptions.uri}');
           return handler.next(response);
         },
         onError: (DioException e, handler) {
