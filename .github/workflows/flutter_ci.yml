@@ -1,0 +1,56 @@
+# Nama Robot Pipeline kita
+name: UTD Advanced CI/CD Pipeline
+
+# Kapan robot ini bekerja? (Setiap kali ada 'push' ke branch 'main' atau 'master')
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build_and_test:
+    # Komputer server yang disewa (Gratis dari GitHub)
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Mengunduh kode dari repository Anda ke server
+      - name: Download / Checkout Code
+        uses: actions/checkout@v3
+
+      # 2. Menginstal Java (dibutuhkan oleh Android)
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      # 3. Menginstal Flutter SDK ke dalam server
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      # 4. Mengunduh semua package (dio, bloc, isar, dll)
+      - name: Install Dependencies
+        run: flutter pub get
+
+      # 5. Membangun ulang file gaib Isar (build_runner)
+      - name: Run Build Runner
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+
+      # 6. Menjalankan Robot Penguji (Sesuai Modul 14)
+      # Catatan: Jika ini error karena kita belum menulis file test, beri tanda # (comment) pada 2 baris di bawah ini untuk sementara.
+      - name: Run Automated Tests
+        run: flutter test
+
+      # 7. Jika Test lulus, buat file APK!
+      - name: Build APK Release
+        run: flutter build apk --release
+
+      # 8. Upload file APK ke halaman GitHub agar bisa kita download!
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: UTD-Advanced-Release-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
