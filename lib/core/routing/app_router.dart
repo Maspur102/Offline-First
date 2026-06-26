@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/home/presentation/cubit/news_cubit.dart';
+import '../../features/settings/presentation/pages/settings_page.dart'; // Import halaman profil
 import '../di/injection.dart';
 
 class AppRouter {
@@ -14,6 +15,11 @@ class AppRouter {
           create: (context) => locator<NewsCubit>(),
           child: const HomePage(),
         ),
+      ),
+      // Rute baru menuju Dashboard Profil
+      GoRoute(
+        path: '/profile',
+        builder: (context, state) => const SettingsPage(),
       ),
     ],
   );
