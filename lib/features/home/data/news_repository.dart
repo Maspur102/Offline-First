@@ -25,6 +25,15 @@ class NewsRepository {
           .where((article) => article.title != null && article.title != '[Removed]')
           .toList();
 
+      // --- TANTANGAN ANTI-AI: LOGIKA SORTING Z KE A (DESCENDING) ---
+      // Berdasarkan digit terakhir NIM 20123011 (Ganjil)
+      articles.sort((a, b) {
+        final titleA = a.title ?? '';
+        final titleB = b.title ?? '';
+        return titleB.compareTo(titleA); // Membandingkan B dengan A untuk urutan Z ke A
+      });
+      // -----------------------------------------------------------
+
       await _isarService.saveArticles(articles);
     } on DioException catch (e) {
       throw Exception('Gagal menyambung ke internet: ${e.message}');
