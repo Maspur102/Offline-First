@@ -1,5 +1,6 @@
 import java.util.Properties
 import java.io.FileInputStream
+import java.util.Base64 // Import baru untuk memecahkan sandi Dart-Define
 
 plugins {
     id("com.android.application")
@@ -17,6 +18,28 @@ if (localPropertiesFile.exists()) {
 
 val flutterVersionCode = localProperties.getProperty("flutter.versionCode") ?: "1"
 val flutterVersionName = localProperties.getProperty("flutter.versionName") ?: "1.0.0"
+
+// --- LOGIKA ANTI-AI: MENGAMBIL NAMA DARI DART-DEFINE ---
+val dartEnvironmentVariables = mutableMapOf<String, String>()
+if (project.hasProperty("dart-defines")) {
+    val dartDefines = project.property("dart-defines") as String
+    dartDefines.split(",").forEach {
+        try {
+            val decoded = String(Base64.getDecoder().decode(it))
+            val parts = decoded.split("=")
+            if (parts.size == 2) {
+                dartEnvironmentVariables[parts[0]] = parts[1]
+            }
+        } catch (e: Exception) {
+            // Abaikan error decoding
+        }
+    }
+}
+
+// Menentukan nama Launcher HP berdasarkan Environment
+val envName = dartEnvironmentVariables["ENV_NAME"] ?: "DEV"
+val appLauncherName = if (envName == "PROD") "UTD - 20123011" else "DEV - Purnama"
+// --------------------------------------------------------
 
 android {
     namespace = "com.example.offline_first"
@@ -37,6 +60,9 @@ android {
         targetSdk = 34
         versionCode = flutterVersionCode.toInt()
         versionName = flutterVersionName
+        
+        // Menyuntikkan nama aplikasi ke dalam file manifest
+        resValue("string", "app_name", appLauncherName)
     }
 
     buildTypes {
