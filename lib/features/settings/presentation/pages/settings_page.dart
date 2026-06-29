@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Wajib untuk Method Channel
 import 'package:lottie/lottie.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -11,18 +12,30 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   int _clickCount = 0;
   bool _showEasterEgg = false;
+  
+  // 1. Deklarasi Nama Jembatan (Harus sama persis dengan yang ada di Kotlin nanti)
+  static const platform = MethodChannel('utd.enterprise.channel/native');
+
+  // 2. Fungsi Pengirim Pesan ke Mesin Kotlin
+  Future<void> _invokeNativeToast() async {
+    try {
+      // Mengirimkan NIM Purnama secara langsung (Anti-AI Challenge)
+      await platform.invokeMethod('showReversedNimToast', {'nim': '20123011'});
+    } on PlatformException catch (e) {
+      debugPrint("Gagal memanggil native channel: '${e.message}'.");
+    }
+  }
 
   void _handleProfileClick() {
-    if (_showEasterEgg) return; // Mencegah klik saat animasi sedang berjalan
+    if (_showEasterEgg) return; 
 
     setState(() {
       _clickCount++;
     });
 
-    // TANTANGAN ANTI-AI: Pemicu animasi berdasarkan digit terakhir NPM (1)
     if (_clickCount == 1) {
       _triggerEasterEgg();
-      _clickCount = 0; // Reset penghitung
+      _clickCount = 0; 
     }
   }
 
@@ -31,7 +44,6 @@ class _SettingsPageState extends State<SettingsPage> {
       _showEasterEgg = true;
     });
 
-    // Menahan animasi tampil di layar selama persis 3 detik
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         setState(() {
@@ -50,7 +62,6 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       body: Stack(
         children: [
-          // Lapis 1: Halaman Profil Utama
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -69,12 +80,24 @@ class _SettingsPageState extends State<SettingsPage> {
                 const Text('Purnama Raharja - 20123011', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 4),
                 const Text('Tugas Individu (UAS)', style: TextStyle(fontSize: 16, color: Colors.grey)),
-                const SizedBox(height: 40),
+                const SizedBox(height: 30),
+                
+                // TOMBOL BARU: Untuk Memicu Native Toast
                 ElevatedButton.icon(
+                  onPressed: _invokeNativeToast,
+                  icon: const Icon(Icons.android, color: Colors.green),
+                  label: const Text('Uji Native Method Channel'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                OutlinedButton.icon(
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.arrow_back),
                   label: const Text('Kembali ke Beranda'),
-                  style: ElevatedButton.styleFrom(
+                  style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   ),
                 )
@@ -82,14 +105,12 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           
-          // Lapis 2: Animasi Lottie Rahasia (Hanya Muncul Saat Dipicu)
           if (_showEasterEgg)
             Positioned.fill(
               child: Container(
-                color: Colors.black87, // Latar gelap agar animasi pop-up menonjol
+                color: Colors.black87, 
                 child: Center(
                   child: Lottie.network(
-                    // Animasi perayaan kembang api & piala
                     'https://lottie.host/17e089d5-f55a-4e20-ae28-66a9359e2f5b/V2aE1EStN3.json', 
                     width: double.infinity,
                     height: double.infinity,
