@@ -12,10 +12,9 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Portal Berita [${EnvConfig.environment}]'),
-        backgroundColor: EnvConfig.isProduction ? Colors.green : Colors.blueGrey,
+        title: Text('DigiNews [${EnvConfig.environment}]'), // Judul sudah diganti
+        // backgroundColor warna hijau sudah dihapus, sekarang otomatis mengikuti tema Biru Gelap
         actions: [
-          // Tombol Ikon Dashboard Profil
           IconButton(
             icon: const Icon(Icons.person), 
             onPressed: () => context.push('/profile')
@@ -26,7 +25,6 @@ class HomePage extends StatelessWidget {
           ),
         ]
       ),
-      // Layar full hanya untuk list berita sekarang
       body: BlocConsumer<NewsCubit, NewsState>(
         listener: (context, state) {
           if (state is NewsLoaded && state.syncErrorMessage != null) {
@@ -64,6 +62,8 @@ class HomePage extends StatelessWidget {
                     return Card(
                       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       child: ListTile(
+                        // Navigasi ke halaman detail saat berita diklik
+                        onTap: () => context.push('/detail', extra: item),
                         leading: item.urlToImage != null && item.urlToImage!.isNotEmpty
                             ? Image.network(
                                 item.urlToImage!, 
