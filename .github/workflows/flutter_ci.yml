@@ -28,14 +28,19 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
 
-      - name: Run Build Runner
+      - name: Run Build Runner (Generate Isar Code)
         run: flutter pub run build_runner build --delete-conflicting-outputs
 
-      - name: Build APK Release
-        run: flutter build apk --release
+      # TANTANGAN ANTI-AI: Menjalankan Unit Test Mocktail di Server
+      - name: Run Unit Tests
+        run: flutter test
+
+      # TANTANGAN ANTI-AI: Build APK wajib mode PROD
+      - name: Build APK Release (Mode PROD)
+        run: flutter build apk --release --dart-define=ENV_NAME=PROD
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: UTD-Advanced-Release-APK
+          name: UTD-20123011-Release-APK
           path: build/app/outputs/flutter-apk/app-release.apk
