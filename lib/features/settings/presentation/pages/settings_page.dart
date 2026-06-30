@@ -17,7 +17,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _invokeNativeToast() async {
     try {
-      await platform.invokeMethod('showReversedNimToast', {'nim': '20123021'});
+      // Mengirimkan NIM Purnama ke Kotlin
+      await platform.invokeMethod('showReversedNimToast', {'nim': '20123011'});
     } on PlatformException catch (e) {
       debugPrint("Gagal memanggil native channel: '${e.message}'.");
     }
@@ -30,6 +31,7 @@ class _SettingsPageState extends State<SettingsPage> {
       _clickCount++;
     });
 
+    // Pemicu Lottie: Karena NIM 20123011 berakhiran angka 1, cukup 1 kali klik!
     if (_clickCount == 1) {
       _triggerEasterEgg();
       _clickCount = 0; 
@@ -62,7 +64,7 @@ class _SettingsPageState extends State<SettingsPage> {
           Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, // PERBAIKAN: Konten merata ke kiri
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(
                   child: Column(
@@ -76,13 +78,13 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      const Text('UTD Store', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                      const Text('DigiNews', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
                 const SizedBox(height: 40),
                 
-                // PERBAIKAN: Menggunakan struktur tabel agar data rapi
+                // Struktur tabel rata kiri dengan identitas Purnama Raharja
                 Table(
                   columnWidths: const {
                     0: IntrinsicColumnWidth(),
@@ -90,9 +92,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     2: FlexColumnWidth(),
                   },
                   children: const [
-                    TableRow(children: [Text('Nama', style: TextStyle(color: Colors.grey, fontSize: 16)), SizedBox(), Text('Rifky Raihan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))]),
+                    TableRow(children: [Text('Nama', style: TextStyle(color: Colors.grey, fontSize: 16)), SizedBox(), Text('Purnama Raharja', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))]),
                     TableRow(children: [SizedBox(height: 12), SizedBox(), SizedBox()]),
-                    TableRow(children: [Text('NPM', style: TextStyle(color: Colors.grey, fontSize: 16)), SizedBox(), Text('20123021', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))]),
+                    TableRow(children: [Text('NPM', style: TextStyle(color: Colors.grey, fontSize: 16)), SizedBox(), Text('20123011', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))]),
                     TableRow(children: [SizedBox(height: 12), SizedBox(), SizedBox()]),
                     TableRow(children: [Text('Keterangan', style: TextStyle(color: Colors.grey, fontSize: 16)), SizedBox(), Text('Tugas Individu', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))]),
                   ],

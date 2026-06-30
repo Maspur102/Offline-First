@@ -34,8 +34,8 @@ if (project.hasProperty("dart-defines")) {
 }
 
 val envName = dartEnvironmentVariables["ENV_NAME"] ?: "DEV"
-val appLauncherName = if (envName == "PROD") "UTD - 20123021" else "DEV - Rifky"
-// PERBAIKAN: Suffix ID agar tidak nabrak saat diinstal berbarengan
+// NAMA APLIKASI SAAT DIINSTAL 
+val appLauncherName = if (envName == "PROD") "UTD - 20123011" else "DEV - Purnama"
 val appIdSuffix = if (envName == "PROD") "" else ".dev" 
 
 android {
@@ -52,7 +52,6 @@ android {
     }
 
     defaultConfig {
-        // Penerapan ID anti-bentrok
         applicationId = "com.example.offline_first$appIdSuffix"
         minSdk = 21 
         targetSdk = 34
