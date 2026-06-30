@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Wajib untuk Method Channel
+import 'package:flutter/services.dart'; 
 import 'package:lottie/lottie.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -13,14 +13,11 @@ class _SettingsPageState extends State<SettingsPage> {
   int _clickCount = 0;
   bool _showEasterEgg = false;
   
-  // 1. Deklarasi Nama Jembatan (Harus sama persis dengan yang ada di Kotlin nanti)
   static const platform = MethodChannel('utd.enterprise.channel/native');
 
-  // 2. Fungsi Pengirim Pesan ke Mesin Kotlin
   Future<void> _invokeNativeToast() async {
     try {
-      // Mengirimkan NIM Purnama secara langsung (Anti-AI Challenge)
-      await platform.invokeMethod('showReversedNimToast', {'nim': '20123011'});
+      await platform.invokeMethod('showReversedNimToast', {'nim': '20123021'});
     } on PlatformException catch (e) {
       debugPrint("Gagal memanggil native channel: '${e.message}'.");
     }
@@ -77,12 +74,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 const SizedBox(height: 24),
                 const Text('UTD Store', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                const Text('Purnama Raharja - 20123011', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                const Text('Rifky Raihan - 20123021', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 4),
-                const Text('Tugas Individu (UAS)', style: TextStyle(fontSize: 16, color: Colors.grey)),
+                const Text('Tugas Individu', style: TextStyle(fontSize: 16, color: Colors.grey)),
                 const SizedBox(height: 30),
                 
-                // TOMBOL BARU: Untuk Memicu Native Toast
                 ElevatedButton.icon(
                   onPressed: _invokeNativeToast,
                   icon: const Icon(Icons.android, color: Colors.green),
@@ -115,6 +111,17 @@ class _SettingsPageState extends State<SettingsPage> {
                     width: double.infinity,
                     height: double.infinity,
                     fit: BoxFit.contain,
+                    // PERBAIKAN: Menampilkan fallback jika tidak ada internet
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.cake, color: Colors.amber, size: 80),
+                          SizedBox(height: 16),
+                          Text('🎉 Easter Egg Terbuka! 🎉\n(Nyalakan internet untuk animasi penuh)', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 16)),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),
