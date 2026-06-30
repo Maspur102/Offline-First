@@ -14,18 +14,22 @@ class FinalProjectApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Logika Warna Utama Anti-AI
-    // Jika PROD, gunakan Biru Gelap. Jika DEV, gunakan warna standar.
     final seedColor = EnvConfig.isProduction ? const Color(0xFF0D47A1) : Colors.blue;
+    // PERBAIKAN: Memaksa warna latar belakang aplikasi
+    final scaffoldColor = EnvConfig.isProduction ? const Color(0xFF07132B) : null; 
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: !EnvConfig.isProduction,
-      // Mengubah internal title aplikasi
-      title: EnvConfig.isProduction ? 'UTD - 20123011' : 'DEV - Purnama',
+      title: 'DigiNews',
       theme: ThemeData(
         useMaterial3: true,
         colorSchemeSeed: seedColor,
         brightness: Brightness.dark,
+        scaffoldBackgroundColor: scaffoldColor, 
+        appBarTheme: AppBarTheme(
+          backgroundColor: seedColor,
+          foregroundColor: Colors.white,
+        ),
       ),
       routerConfig: AppRouter.router,
     );

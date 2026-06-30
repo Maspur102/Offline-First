@@ -3,8 +3,6 @@ name: UTD Advanced CI/CD Pipeline
 on:
   push:
     branches: [ "main", "master" ]
-  pull_request:
-    branches: [ "main", "master" ]
 
 jobs:
   build_and_test:
@@ -31,16 +29,24 @@ jobs:
       - name: Run Build Runner (Generate Isar Code)
         run: flutter pub run build_runner build --delete-conflicting-outputs
 
-      # TANTANGAN ANTI-AI: Menjalankan Unit Test Mocktail di Server
       - name: Run Unit Tests
         run: flutter test
 
-      # TANTANGAN ANTI-AI: Build APK wajib mode PROD
+      # 1. Build & Rename APK DEV
+      - name: Build APK Release (Mode DEV)
+        run: flutter build apk --release --dart-define=ENV_NAME=DEV
+      - name: Rename DEV APK
+        run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/app-dev-release.apk
+
+      # 2. Build & Rename APK PROD
       - name: Build APK Release (Mode PROD)
         run: flutter build apk --release --dart-define=ENV_NAME=PROD
+      - name: Rename PROD APK
+        run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/app-prod-release.apk
 
-      - name: Upload APK Artifact
+      # 3. Upload Keduanya
+      - name: Upload APK Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: UTD-20123011-Release-APK
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: UTD-DigiNews-APKs
+          path: build/app/outputs/flutter-apk/*.apk

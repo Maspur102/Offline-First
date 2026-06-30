@@ -12,91 +12,71 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   int _clickCount = 0;
   bool _showEasterEgg = false;
-  
   static const platform = MethodChannel('utd.enterprise.channel/native');
 
   Future<void> _invokeNativeToast() async {
     try {
       await platform.invokeMethod('showReversedNimToast', {'nim': '20123021'});
-    } on PlatformException catch (e) {
-      debugPrint("Gagal memanggil native channel: '${e.message}'.");
+    } catch (e) {
+      debugPrint("Error: $e");
     }
   }
 
   void _handleProfileClick() {
     if (_showEasterEgg) return; 
-
-    setState(() {
-      _clickCount++;
-    });
-
+    setState(() { _clickCount++; });
     if (_clickCount == 1) {
-      _triggerEasterEgg();
+      setState(() { _showEasterEgg = true; });
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted) setState(() { _showEasterEgg = false; });
+      });
       _clickCount = 0; 
     }
-  }
-
-  void _triggerEasterEgg() {
-    setState(() {
-      _showEasterEgg = true;
-    });
-
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        setState(() {
-          _showEasterEgg = false;
-        });
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dashboard Profil'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Dashboard Profil')),
       body: Stack(
         children: [
-          Center(
+          Padding(
+            padding: const EdgeInsets.all(24.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start, // PERBAIKAN: Rata Kiri
               children: [
                 GestureDetector(
                   onTap: _handleProfileClick,
                   child: const CircleAvatar(
-                    radius: 60,
+                    radius: 45,
                     backgroundColor: Colors.blueAccent,
-                    child: Icon(Icons.person, size: 60, color: Colors.white),
+                    child: Icon(Icons.person, size: 45, color: Colors.white),
                   ),
                 ),
-                const SizedBox(height: 24),
-                const Text('UTD Store', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                const Text('Rifky Raihan - 20123021', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-                const SizedBox(height: 4),
-                const Text('Tugas Individu', style: TextStyle(fontSize: 16, color: Colors.grey)),
-                const SizedBox(height: 30),
+                const SizedBox(height: 32),
                 
+                // PERBAIKAN: Struktur Tabel agar sangat rapi sejajar
+                Table(
+                  columnWidths: const {
+                    0: IntrinsicColumnWidth(),
+                    1: FixedColumnWidth(16),
+                    2: FlexColumnWidth(),
+                  },
+                  children: const [
+                    TableRow(children: [Text('Aplikasi', style: TextStyle(color: Colors.grey, fontSize: 16)), SizedBox(), Text('UTD Store', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))]),
+                    TableRow(children: [SizedBox(height: 12), SizedBox(), SizedBox()]),
+                    TableRow(children: [Text('Nama', style: TextStyle(color: Colors.grey, fontSize: 16)), SizedBox(), Text('Rifky Raihan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))]),
+                    TableRow(children: [SizedBox(height: 12), SizedBox(), SizedBox()]),
+                    TableRow(children: [Text('NIM', style: TextStyle(color: Colors.grey, fontSize: 16)), SizedBox(), Text('20123021', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))]),
+                  ],
+                ),
+                
+                const SizedBox(height: 40),
                 ElevatedButton.icon(
                   onPressed: _invokeNativeToast,
                   icon: const Icon(Icons.android, color: Colors.green),
                   label: const Text('Uji Native Method Channel'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  ),
                 ),
-                const SizedBox(height: 12),
-
-                OutlinedButton.icon(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.arrow_back),
-                  label: const Text('Kembali ke Beranda'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  ),
-                )
               ],
             ),
           ),
@@ -108,20 +88,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: Center(
                   child: Lottie.network(
                     'https://lottie.host/17e089d5-f55a-4e20-ae28-66a9359e2f5b/V2aE1EStN3.json', 
-                    width: double.infinity,
-                    height: double.infinity,
-                    fit: BoxFit.contain,
-                    // PERBAIKAN: Menampilkan fallback jika tidak ada internet
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.cake, color: Colors.amber, size: 80),
-                          SizedBox(height: 16),
-                          Text('🎉 Easter Egg Terbuka! 🎉\n(Nyalakan internet untuk animasi penuh)', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 16)),
-                        ],
-                      );
-                    },
+                    errorBuilder: (c, e, s) => const Icon(Icons.cake, color: Colors.amber, size: 80),
                   ),
                 ),
               ),
