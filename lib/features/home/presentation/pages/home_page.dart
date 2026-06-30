@@ -11,7 +11,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('DigiNews'), // PERBAIKAN: Bersih tanpa teks environment
+        title: const Text('DigiNews'), // Sudah bersih tanpa teks lingkungan
         actions: [
           IconButton(
             icon: const Icon(Icons.person), 
@@ -35,36 +35,59 @@ class HomePage extends StatelessWidget {
           if (state is NewsLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is NewsError) {
-            return Center(child: Text(state.message));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.wifi_off, size: 60, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text(state.message, textAlign: TextAlign.center),
+                ]
+              )
+            );
           } else if (state is NewsLoaded) {
             final articles = state.articles;
-            if (articles.isEmpty) return const Center(child: Text('Belum ada berita.'));
+            if (articles.isEmpty) {
+              return const Center(child: Text('Belum ada berita. Menarik data dari API...'));
+            }
             
-            return ListView.builder(
-              itemCount: articles.length,
-              itemBuilder: (context, index) {
-                final item = articles[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: ListTile(
-                    onTap: () => context.push('/detail', extra: item),
-                    leading: const Icon(Icons.article, size: 50),
-                    title: Text(item.title ?? 'Tanpa Judul', maxLines: 2),
-                    trailing: IconButton(
-                      icon: Icon(
-                        item.isBookmarked ? Icons.bookmark : Icons.bookmark_border, 
-                        color: item.isBookmarked ? Colors.blue : Colors.grey
+            return Stack(
+              children: [
+                ListView.builder(
+                  itemCount: articles.length,
+                  itemBuilder: (context, index) {
+                    final item = articles[index];
+                    return Card(
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: ListTile(
+                        onTap: () => context.push('/detail', extra: item),
+                        leading: item.urlToImage != null && item.urlToImage!.isNotEmpty
+                            ? Image.network(
+                                item.urlToImage!, 
+                                width: 80, height: 80, fit: BoxFit.cover, 
+                                errorBuilder: (_,__,___) => const Icon(Icons.image_not_supported)
+                              )
+                            : const Icon(Icons.article, size: 50),
+                        title: Text(item.title ?? 'Tanpa Judul', maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text(item.author ?? 'Unknown', maxLines: 1),
+                        trailing: IconButton(
+                          icon: Icon(
+                            item.isBookmarked ? Icons.bookmark : Icons.bookmark_border, 
+                            color: item.isBookmarked ? Colors.blue : Colors.grey
+                          ),
+                          // PERBAIKAN: Bookmark membalikkan nilainya dan menyimpan
+                          onPressed: () => context.read<NewsCubit>().toggleBookmark(item.id, !item.isBookmarked),
+                        ),
                       ),
-                      // PERBAIKAN: Mengirim status boolean kebalikan untuk ditoggle
-                      onPressed: () {
-                        context.read<NewsCubit>().toggleBookmark(item.id, !item.isBookmarked);
-                        // Trigger re-sync ringan jika UI tidak otomatis merender
-                        context.read<NewsCubit>().syncNews(); 
-                      },
-                    ),
-                  ),
-                );
-              }
+                    );
+                  }
+                ),
+                if (state.isSyncing)
+                  const Positioned(
+                    top: 0, left: 0, right: 0,
+                    child: LinearProgressIndicator()
+                  )
+              ]
             );
           }
           return const SizedBox.shrink();

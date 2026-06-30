@@ -12,50 +12,77 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   int _clickCount = 0;
   bool _showEasterEgg = false;
+  
   static const platform = MethodChannel('utd.enterprise.channel/native');
 
   Future<void> _invokeNativeToast() async {
     try {
       await platform.invokeMethod('showReversedNimToast', {'nim': '20123021'});
-    } catch (e) {
-      debugPrint("Error: $e");
+    } on PlatformException catch (e) {
+      debugPrint("Gagal memanggil native channel: '${e.message}'.");
     }
   }
 
   void _handleProfileClick() {
     if (_showEasterEgg) return; 
-    setState(() { _clickCount++; });
+
+    setState(() {
+      _clickCount++;
+    });
+
     if (_clickCount == 1) {
-      setState(() { _showEasterEgg = true; });
-      Future.delayed(const Duration(seconds: 3), () {
-        if (mounted) setState(() { _showEasterEgg = false; });
-      });
+      _triggerEasterEgg();
       _clickCount = 0; 
     }
+  }
+
+  void _triggerEasterEgg() {
+    setState(() {
+      _showEasterEgg = true;
+    });
+
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _showEasterEgg = false;
+        });
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Dashboard Profil')),
+      appBar: AppBar(
+        title: const Text('Dashboard Profil'),
+        centerTitle: true,
+      ),
       body: Stack(
         children: [
           Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, // PERBAIKAN: Rata Kiri
+              crossAxisAlignment: CrossAxisAlignment.start, // PERBAIKAN: Konten merata ke kiri
               children: [
-                GestureDetector(
-                  onTap: _handleProfileClick,
-                  child: const CircleAvatar(
-                    radius: 45,
-                    backgroundColor: Colors.blueAccent,
-                    child: Icon(Icons.person, size: 45, color: Colors.white),
+                Center(
+                  child: Column(
+                    children: [
+                      GestureDetector(
+                        onTap: _handleProfileClick,
+                        child: const CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.blueAccent,
+                          child: Icon(Icons.person, size: 50, color: Colors.white),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text('UTD Store', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 40),
                 
-                // PERBAIKAN: Struktur Tabel agar sangat rapi sejajar
+                // PERBAIKAN: Menggunakan struktur tabel agar data rapi
                 Table(
                   columnWidths: const {
                     0: IntrinsicColumnWidth(),
@@ -63,11 +90,11 @@ class _SettingsPageState extends State<SettingsPage> {
                     2: FlexColumnWidth(),
                   },
                   children: const [
-                    TableRow(children: [Text('Aplikasi', style: TextStyle(color: Colors.grey, fontSize: 16)), SizedBox(), Text('UTD Store', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))]),
-                    TableRow(children: [SizedBox(height: 12), SizedBox(), SizedBox()]),
                     TableRow(children: [Text('Nama', style: TextStyle(color: Colors.grey, fontSize: 16)), SizedBox(), Text('Rifky Raihan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))]),
                     TableRow(children: [SizedBox(height: 12), SizedBox(), SizedBox()]),
-                    TableRow(children: [Text('NIM', style: TextStyle(color: Colors.grey, fontSize: 16)), SizedBox(), Text('20123021', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))]),
+                    TableRow(children: [Text('NPM', style: TextStyle(color: Colors.grey, fontSize: 16)), SizedBox(), Text('20123021', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))]),
+                    TableRow(children: [SizedBox(height: 12), SizedBox(), SizedBox()]),
+                    TableRow(children: [Text('Keterangan', style: TextStyle(color: Colors.grey, fontSize: 16)), SizedBox(), Text('Tugas Individu', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))]),
                   ],
                 ),
                 
@@ -76,7 +103,19 @@ class _SettingsPageState extends State<SettingsPage> {
                   onPressed: _invokeNativeToast,
                   icon: const Icon(Icons.android, color: Colors.green),
                   label: const Text('Uji Native Method Channel'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
                 ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.arrow_back),
+                  label: const Text('Kembali ke Beranda'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                )
               ],
             ),
           ),
@@ -88,7 +127,19 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: Center(
                   child: Lottie.network(
                     'https://lottie.host/17e089d5-f55a-4e20-ae28-66a9359e2f5b/V2aE1EStN3.json', 
-                    errorBuilder: (c, e, s) => const Icon(Icons.cake, color: Colors.amber, size: 80),
+                    width: double.infinity,
+                    height: double.infinity,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.cake, color: Colors.amber, size: 80),
+                          SizedBox(height: 16),
+                          Text('🎉 Easter Egg Terbuka! 🎉\n(Nyalakan internet untuk animasi penuh)', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 16)),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),

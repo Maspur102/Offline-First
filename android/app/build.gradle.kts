@@ -1,6 +1,6 @@
 import java.util.Properties
 import java.io.FileInputStream
-import java.util.Base64 // Import baru untuk memecahkan sandi Dart-Define
+import java.util.Base64 
 
 plugins {
     id("com.android.application")
@@ -8,7 +8,13 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-// ... (Pertahankan kode import dan plugin di atasnya) ...
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { stream ->
+        localProperties.load(stream)
+    }
+}
 
 val flutterVersionCode = localProperties.getProperty("flutter.versionCode") ?: "1"
 val flutterVersionName = localProperties.getProperty("flutter.versionName") ?: "1.0.0"
@@ -18,7 +24,7 @@ if (project.hasProperty("dart-defines")) {
     val dartDefines = project.property("dart-defines") as String
     dartDefines.split(",").forEach {
         try {
-            val decoded = String(java.util.Base64.getDecoder().decode(it))
+            val decoded = String(Base64.getDecoder().decode(it))
             val parts = decoded.split("=")
             if (parts.size == 2) {
                 dartEnvironmentVariables[parts[0]] = parts[1]
@@ -28,9 +34,8 @@ if (project.hasProperty("dart-defines")) {
 }
 
 val envName = dartEnvironmentVariables["ENV_NAME"] ?: "DEV"
-// Nama otomatis berubah
 val appLauncherName = if (envName == "PROD") "UTD - 20123021" else "DEV - Rifky"
-// ID otomatis berubah agar tidak bentrok saat diinstal bersamaan
+// PERBAIKAN: Suffix ID agar tidak nabrak saat diinstal berbarengan
 val appIdSuffix = if (envName == "PROD") "" else ".dev" 
 
 android {
@@ -41,6 +46,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
     kotlinOptions {
         jvmTarget = "17"
     }
