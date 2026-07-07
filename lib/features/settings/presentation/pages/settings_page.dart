@@ -56,7 +56,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MyProfile'),
+        title: const Text('Dashboard Profil'),
         centerTitle: true,
       ),
       body: Stack(
