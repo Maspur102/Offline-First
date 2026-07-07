@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Jalankan Mode DEV",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart",
+            "args": [
+                "--dart-define=ENV_NAME=DEV"
+            ]
+        },
+        {
+            "name": "Jalankan Mode PROD",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart",
+            "args": [
+                "--dart-define=ENV_NAME=PROD"
+            ]
+        }
+    ]
+}
